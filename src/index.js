@@ -5,23 +5,30 @@ import {
   createStore
 } from "redux";
 
-const makeLouder = (string) => string.toUpperCase();
-const repeatThreeTimes = (string) => string.repeat(3);
-const embolden = (string) => string.bold();
+const initialState = { value: 0 };
 
-embolden(repeatThreeTimes(makeLouder("hello")));
+const INCREMENT = "INCREMENT";
+const ADD = "ADD";
 
-// const makeLouderAndBoldAndRepeatThreeTimes = (string) =>
-//   embolden(repeatThreeTimes(makeLouder(string)));
+const increment = () => ({ type: INCREMENT });
+const add = (number) => ({ type: ADD, payload: number });
 
-const makeLouderAndBoldAndRepeatThreeTimes = compose(
-  embolden,
-  repeatThreeTimes,
-  makeLouder
-);
+const reducer = (state = initialState, action) => {
+  if (action.type === INCREMENT) {
+    return { value: state.value + 1 };
+  }
 
-// is the same as
-//  const makeLouderAndBoldAndRepeatThreeTimes = (string) =>
-//   embolden(repeatThreeTimes(makeLouder(string)));
+  if (action.type === ADD) {
+    return { value: state.value + action.payload };
+  }
 
-console.log(makeLouderAndBoldAndRepeatThreeTimes("ved "));
+  return state;
+};
+
+let store = createStore(reducer);
+
+console.log(store.getState());
+store.dispatch(increment());
+console.log(store.getState());
+store.dispatch(add(10));
+console.log(store.getState());
