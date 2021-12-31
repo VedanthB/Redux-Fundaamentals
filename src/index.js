@@ -2,73 +2,48 @@ import {
   applyMiddleware,
   bindActionCreators,
   compose,
-  createStore
+  createStore,
+  combineReducers
 } from "redux";
 
-const initialState = { value: 0 };
+const initialState = {
+  users: [
+    { id: 1, name: "Steve" },
+    { id: 2, name: "Wes" }
+  ],
+  tasks: [
+    { title: "File the TPS reports", assignedTo: 1 },
+    { title: "Order more toner for the printer", assignedTo: null }
+  ]
+};
 
-const INCREMENT = "INCREMENT";
-const ADD = "ADD";
+const ADD_USER = "ADD_USER";
+const ADD_TASK = "ADD_TASK";
 
-const increment = () => ({ type: INCREMENT });
-const add = (number) => ({ type: ADD, payload: number });
+const addTask = (title) => ({ type: ADD_TASK, payload: { title } });
+const addUser = (name) => ({ type: ADD_USER, payload: { name } });
 
-const reducer = (state = initialState, action) => {
-  if (action.type === INCREMENT) {
-    return { value: state.value + 1 };
-  }
-
-  if (action.type === ADD) {
-    return { value: state.value + action.payload };
+const users = (state = initialState.users, action) => {
+  if (action.type === ADD_USER) {
+    return [...state, action.payload];
   }
 
   return state;
 };
 
-let store = createStore(reducer);
+const tasks = (state = initialState.tasks, action) => {
+  if (action.type === ADD_TASK) {
+    return [...state, action.payload];
+  }
 
-const subsscriber = () => console.log("subscriber!", store.getState());
+  return state;
+};
 
-const unsubscribe = store.subscribe(subsscriber);
+const reducer = combineReducers({ users, tasks });
 
-unsubscribe();
+const store = createStore(reducer, initialState);
 
-// if we want to put em in a neat package
-
-// const dispatchIncrement = () => store.dispatch(increment());
-// const dispatchAdd = (number) => store.dispatch(add(number));
-
-// dispatchIncrement();
-// dispatchAdd();
-
-// or
-
-// using compose
-
-// const dispatchIncrement = compose(store.dispatch, increment);
-// const dispatchAdd = compose(store.dispatch, add);
-
-// or
-
-// using compose to combine both functions
-
-// const [dispatchIncrement, dispatchAdd] = [increment, add].map((fn) =>
-//   compose(store.dispatch, fn)
-// );
-
-// using bindActionCreators
-
-const actions = bindActionCreators(
-  {
-    increment,
-    add
-  },
-  store.dispatch
-);
-
-actions.increment();
-actions.add(10);
-actions.add(100);
-actions.increment();
+store.dispatch(addUser("ved"));
+store.dispatch(addTask("vedVedved"));
 
 console.log(store.getState());
